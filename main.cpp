@@ -1,6 +1,7 @@
 #include <iostream>
 #include <rfl/json.hpp>
 #include <rfl.hpp>
+#include <glaze/json.hpp>
 
 
 struct HitData {
@@ -14,6 +15,16 @@ struct EventData {
     uint16_t l1id{};
     uint16_t bcid{};
     std::vector<HitData> hits;
+};
+
+template <>
+struct glz::meta<HitData> {
+    using T = HitData;
+    static constexpr auto value = array(
+            &T::x,
+            &T::y,
+            &T::tot
+    );
 };
 
 class Event {
@@ -40,5 +51,8 @@ int main() {
     const std::string json_string2 = rfl::json::write(event);
     std::cout << json_string2 <<  "\n";
     auto event2 = rfl::json::read<EventData, rfl::NoFieldNames>(json_string1).value();
+
+    std::cout << glz::write_json(event).value_or("error") << "\n";
+
     return 0;
 }
